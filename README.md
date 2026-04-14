@@ -1,4 +1,4 @@
-# Validation Tests
+# Alibaba Tests
 
 ##Single node tests
 
@@ -31,8 +31,9 @@ Test 12. Multi Node Collective Communication	RCCL - AlltoAll Bandwidth
 
 
 
-# Pre-requisite Install docker 
+# Pre-requisite 
 
+Install docker 
 ```
 sudo dnf remove -y podman buildah containers-common
 
@@ -51,8 +52,7 @@ newgrp docker
 docker run hello-world #test docker
 ```
 
-
-# Clone this repository
+Clone the alibaba repository as below:
 
 ```
 git clone https://github.com/prasad-nair-amd/alibaba.git
@@ -72,10 +72,35 @@ docker run --rm   --device=/dev/kfd   --device=/dev/dri   --group-add video   --
 
 ## Test 2. Single Card Performance	Qwen2.5-32B Model Training Performance (BF16)
 
+Access the Qwen_alibaba.tar file in this repo and untar the file. Follow the steps below:
+```
+$ cd qwen
+$ bash set_env
+$ cd Training-Benchmark
+$ bash  scripts/MI355/perf_test_qwen2.5_32b.sh
 
+# result are under this directory
+# ls qwen/Training-Benchmark/third_party/Primus/output
+
+the result file is : log_mp_pretrain_qwen2.5_32B-BF16-pretrain.txt
+ 
+```
 
 ## Test 3. Single Card Training Performance	Qwen2.5-32B Model Training Performance (BF16)
+Instructions same as Test 2. You can configure the script to make it run on 1 GPU or 8 GPU
+Access the Qwen_alibaba.tar file in this repo and untar the file. Follow the steps below:
+```
+$ cd qwen
+$ bash set_env
+$ cd Training-Benchmark
+$ bash  scripts/MI355/perf_test_qwen2.5_32b.sh
 
+# result are under this directory
+# ls qwen/Training-Benchmark/third_party/Primus/output
+
+the result file is : log_mp_pretrain_qwen2.5_32B-BF16-pretrain.txt
+ 
+```
 ## Test 4. Single Node Collective Communication	P2P Bandwidth
 ```
 git clone https://github.com/prasad-nair-amd/rapido.git

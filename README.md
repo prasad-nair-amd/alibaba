@@ -131,7 +131,10 @@ docker run --rm   --device=/dev/kfd   --device=/dev/dri   --group-add video   --
 ```
 
 ## Test 7. Single Node Collective Communication	Mori-EP
-
+```
+cd Mori
+$ ./run_intra_mori.sh
+```
 ## Test 8. Multi Node Collective Communication	ib_write_bw Test
 
 ## Test 9. Multi Node Collective Communication	ib_write_bw GDR Test

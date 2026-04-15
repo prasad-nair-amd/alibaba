@@ -138,7 +138,10 @@ $ ./run_intra_mori.sh
 ## Test 8. Multi Node Collective Communication	ib_write_bw Test
 
 For running IB bandwidth test you should first find the mapping of rdma interfaces between two nodes. 
-You can refer to the document Alinux RDMA Guide.docx in the repo. In the below example ionic_7 interface 
+You can refer to the document ![Alinux RDMA Guide.docx](https://github.com/prasad-nair-amd/alibaba/raw/refs/heads/main/Alinux%20RDMA%20Guide.docx) in the repo. 
+You can use the script provided in the repo (ionic_mapping.sh) to findout the mapping of rdma interfaces.
+
+In the below example ionic_7 interface 
 is mapped to ionic_1
 
 ```

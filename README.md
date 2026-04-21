@@ -72,7 +72,9 @@ docker run --rm   --device=/dev/kfd   --device=/dev/dri   --group-add video   --
 
 ## Test 2. Single Card Performance	Qwen2.5-32B Model Training Performance (BF16)
 
-Access the Qwen_alibaba.tar file in this repo and untar the file. Follow the steps below:
+Access the Qwen_alibaba.tar file :
+
+Follow the steps below:
 ```
 $ cd qwen
 $ bash set_env
@@ -289,7 +291,7 @@ Total run time: 187.693s
 
 ## Test 9. Multi Node Collective Communication	ib_write_bw GDR Test
 
-Download the AINIC driver package file from here : https://drive.google.com/file/d/1A-vlVZ0ruBMvnDIP9GyHwlJZGOtiCscX/view?usp=drive_link
+Download the AINIC driver package file from here : [AU NIC driver package](https://drive.google.com/file/d/1ZUF1ecHVYp85xjiF5jR72UHdo8hzXTKA/view?usp=drive_link)
 
 Testing GPUDirect RDMA (GDR) on AMD GPUs using ib_write_bw requires building the perftest package with ROCm support to enable direct memory access between the InfiniBand/RoCE NIC and AMD GPU memory, bypassing the CPU. 
 

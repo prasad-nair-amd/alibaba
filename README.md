@@ -132,17 +132,15 @@ docker run --rm   --device=/dev/kfd   --device=/dev/dri   --group-add video   --
 
 ## Test 7. Single Node Collective Communication	Mori-EP
 ```
-cd Mori
 $ ./run_intra_mori.sh
 ```
 ## Test 8. Multi Node Collective Communication	ib_write_bw Test
 
 For running IB bandwidth test you should first find the mapping of rdma interfaces between two nodes. 
-You can refer to the document ![Alinux RDMA Guide.docx](https://github.com/prasad-nair-amd/alibaba/raw/refs/heads/main/Alinux%20RDMA%20Guide.docx) in the repo. 
+You can refer to the document ![Alinux RDMA Guide.docx](https://github.com/prasad-nair-amd/alibaba/raw/refs/heads/main/Alinux%20RDMA%20Guide.docx) in the repo for running the test in parallel. 
 You can use the script provided in the repo (ionic_mapping.sh) to findout the mapping of rdma interfaces.
 
-In the below example ionic_7 interface 
-is mapped to ionic_1
+In the below example ionic_7 interface is mapped to ionic_1
 
 ```
 
@@ -291,7 +289,170 @@ Total run time: 187.693s
 
 ## Test 9. Multi Node Collective Communication	ib_write_bw GDR Test
 
+Download the AINIC driver package file from here : https://drive.google.com/file/d/1A-vlVZ0ruBMvnDIP9GyHwlJZGOtiCscX/view?usp=drive_link
+
+Testing GPUDirect RDMA (GDR) on AMD GPUs using ib_write_bw requires building the perftest package with ROCm support to enable direct memory access between the InfiniBand/RoCE NIC and AMD GPU memory, bypassing the CPU. 
+
+
+1. Build Perftest for AMD ROCm 
+You must compile perftest with ROCm enabled.
+Navigate to the driver directory:
+
+bash
+tar -xvf ainic_bundle_1.117.5-a-82.tar.gz
+cd ainic_bundle_1.117.5-a-82/host_sw_pkg/ionic_driver/src/drivers-linux/perftest
+
+Configure and build:
+bash
+./autogen.sh
+./configure --prefix=`pwd` --enable-rocm --with-rocm=/opt/rocm
+make
+sudo make install
+
+Verify installation:
+Run ib_write_bw -h and check for the --use_rocm flag. 
+
+2. Prepare the System
+Load ib_peer_mem: Ensure the kernel module is loaded to allow IB devices to access ROCm memory.
+
+bash
+lsmod | grep ib_peer_mem
+Enable P2P/Disable ACS: Ensure the NIC and GPU are on the same PCIe bridge and that PCIe Access Control Services (ACS) are disabled to allow Peer-to-Peer (P2P) traffic. 
+
+3. Running the Test
+
+Server Node:
+bash
+
+
+-d is the IB device (e.g., mlx5_0), -a is bidirectional, --use_rocm allows GPU
+./ib_write_bw -d <ib_device> --use_rocm=<gpu_id> -a
+
+Client Node:
+bash
+./ib_write_bw -d <ib_device> --use_rocm=<gpu_id> -a <server_ip>
+Optional - DMABUF: If using a modern ROCm setup (e.g., MI300X), you can use --enable-rocm-dmabuf during configure and add --use_rocm_dmabuf to your run command for improved performance. 
+
+
+``` 
+
+Server-side example :
+[vultr@Aliyun3 perftest]$ ./ib_write_bw -d ionic_0 --use_rocm=0 -a
+Using sampled CPU speed 3295 MHz over reported speed 5008 MHz
+
+************************************
+* Waiting for client to connect... *
+************************************
+Connected: Tue Apr 21 08:12:52 2026
+
+Using ROCm Device with ID: 0, Name: AMD Instinct MI355X, PCI Bus ID: 0x5, GCN Arch: gfx950:sramecc+:xnack-
+allocated 16777216 bytes of GPU buffer at 0x7f042a400000
+---------------------------------------------------------------------------------------
+                    RDMA_Write BW Test
+ Dual-port       : OFF          Device         : ionic_0
+ Number of qps   : 1            Transport type : IB
+ Connection type : RC           Using SRQ      : OFF
+ PCIe relax order: ON           Lock-free      : OFF
+ ibv_wr* API     : OFF          Using DDP      : OFF
+ CQ Moderation   : 100
+ CQE Poll Batch  : 16
+ Mtu             : 4096[B]
+ Link type       : Ethernet
+ CPU freq        : 3295[MHz]
+ GID index       : 0
+ Max inline data : 0[B]
+ rdma_cm QPs     : OFF
+ Use ROCm memory : ON
+ Data ex. method : Ethernet
+---------------------------------------------------------------------------------------
+ local address: LID 0000 QPN 0x0002 PSN 0x9c4c2e RKey 0x000182 VAddr 0x007f042ac00000
+ GID: 254:128:00:00:00:00:00:00:06:144:129:255:254:54:91:176
+ remote address: LID 0000 QPN 0x0002 PSN 0x398b12 RKey 0x000184 VAddr 0x007fe939e00000
+ GID: 254:128:00:00:00:00:00:00:06:144:129:255:254:56:231:64
+---------------------------------------------------------------------------------------
+ #bytes     #iterations    BW peak[MiB/sec]    BW average[MiB/sec]   MsgRate[Mpps]
+ 8388608    5000             19044.44            19044.43                    0.002381
+---------------------------------------------------------------------------------------
+Completed: Tue Apr 21 08:12:57 2026
+
+Total run time: 98.367s
+deallocating GPU buffer 0x7f042a400000
+
+
+Client-side example :
+[vultr@Aliyun1 perftest]$ ./ib_write_bw -d ionic_0 --use_rocm=0 -a 45.76.25.46
+Using sampled CPU speed 3295 MHz over reported speed 5022 MHz
+Connected: Tue Apr 21 08:12:52 2026
+
+Using ROCm Device with ID: 0, Name: AMD Instinct MI355X, PCI Bus ID: 0x5, GCN Arch: gfx950:sramecc+:xnack-
+allocated 16777216 bytes of GPU buffer at 0x7fe939600000
+---------------------------------------------------------------------------------------
+                    RDMA_Write BW Test
+ Dual-port       : OFF          Device         : ionic_0
+ Number of qps   : 1            Transport type : IB
+ Connection type : RC           Using SRQ      : OFF
+ PCIe relax order: ON           Lock-free      : OFF
+ ibv_wr* API     : OFF          Using DDP      : OFF
+ TX depth        : 128
+ CQ Moderation   : 100
+ CQE Poll Batch  : 16
+ Mtu             : 4096[B]
+ Link type       : Ethernet
+ CPU freq        : 3295[MHz]
+ GID index       : 0
+ Max inline data : 0[B]
+ rdma_cm QPs     : OFF
+ Use ROCm memory : ON
+ Data ex. method : Ethernet
+---------------------------------------------------------------------------------------
+ local address: LID 0000 QPN 0x0002 PSN 0x398b12 RKey 0x000184 VAddr 0x007fe939e00000
+ GID: 254:128:00:00:00:00:00:00:06:144:129:255:254:56:231:64
+ remote address: LID 0000 QPN 0x0002 PSN 0x9c4c2e RKey 0x000182 VAddr 0x007f042ac00000
+ GID: 254:128:00:00:00:00:00:00:06:144:129:255:254:54:91:176
+---------------------------------------------------------------------------------------
+ #bytes     #iterations    BW peak[MiB/sec]    BW average[MiB/sec]   MsgRate[Mpps]
+ 2          5000             6.82               6.76                 3.543784
+ 4          5000             13.65              13.60                3.565549
+ 8          5000             27.57              27.35                3.584287
+ 16         5000             54.77              54.53                3.573972
+ 32         5000             109.30             108.96               3.570471
+ 64         5000             220.76             219.55               3.597148
+ 128        5000             436.26             415.65               3.404981
+ 256        5000             881.12             880.74               3.607493
+ 512        5000             1750.74            1749.40              3.582769
+ 1024       5000             3516.78            3494.28              3.578147
+ 2048       5000             7002.95            6941.36              3.553975
+ 4096       5000             13693.01            13639.21                    3.491638
+ 8192       5000             19878.65            19871.68                    2.543574
+ 16384      5000             18647.48            18645.54                    1.193314
+ 32768      5000             19033.53            19032.42                    0.609037
+ 65536      5000             18683.01            18682.46                    0.298919
+ 131072     5000             18584.38            18583.90                    0.148671
+ 262144     5000             18579.35            18579.29                    0.074317
+ 524288     5000             18765.36            18765.26                    0.037531
+ 1048576    5000             18635.36            18635.27                    0.018635
+ 2097152    5000             18787.56            18787.52                    0.009394
+ 4194304    5000             19045.85            19045.80                    0.004761
+ 8388608    5000             19044.44            19044.43                    0.002381
+---------------------------------------------------------------------------------------
+Completed: Tue Apr 21 08:12:57 2026
+
+Total run time: 5.459s
+deallocating GPU buffer 0x7fe939600000
+
+
+
+```
+
+
 ## Test 10. Multi Node Collective Communication	Mori-EP
+
+For running multinode Mori tests run the script on both nodes simultaneously.
+
+You have to configure the r2.sh file inside the container to set the ip address of remote device. 
+
+$ ./run_inter_mori.sh 
+
 
 ## Test 11. Multi Node Collective Communication	RCCL - AllReduce Bandwidth
 

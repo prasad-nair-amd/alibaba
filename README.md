@@ -72,7 +72,7 @@ docker run --rm   --device=/dev/kfd   --device=/dev/dri   --group-add video   --
 
 ## Test 2. Single Card Performance	Qwen2.5-32B Model Training Performance (BF16)
 
-Access the Qwen_alibaba.tar file :
+Access the Qwen_alibaba.tar file : https://drive.google.com/file/d/1UW0TwdFVzXI69cAmeTBG1xEftcRT2JML/view?usp=drive_link
 
 Follow the steps below:
 ```

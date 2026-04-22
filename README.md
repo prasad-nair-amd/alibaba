@@ -329,69 +329,31 @@ bash
 
 -d is the IB device (e.g., mlx5_0), -a is bidirectional, --use_rocm allows GPU
 ./ib_write_bw -d <ib_device> --use_rocm=<gpu_id> -a
+for example : ./ib_write_bw -d ionic_1 -i 1 -F -x 1 -q 4 --tclass 104 -a --report_gbits -b -p 5001 --use_rocm=1
 
 Client Node:
 bash
 ./ib_write_bw -d <ib_device> --use_rocm=<gpu_id> -a <server_ip>
+for example : ./ib_write_bw -d ionic_1 -i 1 -F -x 1 -q 4 --tclass 104 -a --report_gbits -b -p 5001 --use_rocm=1 66.42.116.72
 Optional - DMABUF: If using a modern ROCm setup (e.g., MI300X), you can use --enable-rocm-dmabuf during configure and add --use_rocm_dmabuf to your run command for improved performance. 
 
 
 ``` 
-
 Server-side example :
-[vultr@Aliyun3 perftest]$ ./ib_write_bw -d ionic_0 --use_rocm=0 -a
+[vultr@Aliyun1 perftest]$ ./ib_write_bw -d ionic_1 -i 1 -F -x 1 -q 4 --tclass 104 -a --report_gbits -b -p 5001 --use_rocm=1
 Using sampled CPU speed 3295 MHz over reported speed 5008 MHz
 
 ************************************
 * Waiting for client to connect... *
 ************************************
-Connected: Tue Apr 21 08:12:52 2026
+Connected: Thu Apr 23 01:20:55 2026
 
-Using ROCm Device with ID: 0, Name: AMD Instinct MI355X, PCI Bus ID: 0x5, GCN Arch: gfx950:sramecc+:xnack-
-allocated 16777216 bytes of GPU buffer at 0x7f042a400000
+Using ROCm Device with ID: 1, Name: AMD Instinct MI355X, PCI Bus ID: 0x15, GCN Arch: gfx950:sramecc+:xnack-
+allocated 67108864 bytes of GPU buffer at 0x7f9c1ee00000
 ---------------------------------------------------------------------------------------
-                    RDMA_Write BW Test
- Dual-port       : OFF          Device         : ionic_0
- Number of qps   : 1            Transport type : IB
- Connection type : RC           Using SRQ      : OFF
- PCIe relax order: ON           Lock-free      : OFF
- ibv_wr* API     : OFF          Using DDP      : OFF
- CQ Moderation   : 100
- CQE Poll Batch  : 16
- Mtu             : 4096[B]
- Link type       : Ethernet
- CPU freq        : 3295[MHz]
- GID index       : 0
- Max inline data : 0[B]
- rdma_cm QPs     : OFF
- Use ROCm memory : ON
- Data ex. method : Ethernet
----------------------------------------------------------------------------------------
- local address: LID 0000 QPN 0x0002 PSN 0x9c4c2e RKey 0x000182 VAddr 0x007f042ac00000
- GID: 254:128:00:00:00:00:00:00:06:144:129:255:254:54:91:176
- remote address: LID 0000 QPN 0x0002 PSN 0x398b12 RKey 0x000184 VAddr 0x007fe939e00000
- GID: 254:128:00:00:00:00:00:00:06:144:129:255:254:56:231:64
----------------------------------------------------------------------------------------
- #bytes     #iterations    BW peak[MiB/sec]    BW average[MiB/sec]   MsgRate[Mpps]
- 8388608    5000             19044.44            19044.43                    0.002381
----------------------------------------------------------------------------------------
-Completed: Tue Apr 21 08:12:57 2026
-
-Total run time: 98.367s
-deallocating GPU buffer 0x7f042a400000
-
-
-Client-side example :
-[vultr@Aliyun1 perftest]$ ./ib_write_bw -d ionic_0 --use_rocm=0 -a 45.76.25.46
-Using sampled CPU speed 3295 MHz over reported speed 5022 MHz
-Connected: Tue Apr 21 08:12:52 2026
-
-Using ROCm Device with ID: 0, Name: AMD Instinct MI355X, PCI Bus ID: 0x5, GCN Arch: gfx950:sramecc+:xnack-
-allocated 16777216 bytes of GPU buffer at 0x7fe939600000
----------------------------------------------------------------------------------------
-                    RDMA_Write BW Test
- Dual-port       : OFF          Device         : ionic_0
- Number of qps   : 1            Transport type : IB
+                    RDMA_Write Bidirectional BW Test
+ Dual-port       : OFF          Device         : ionic_1
+ Number of qps   : 4            Transport type : IB
  Connection type : RC           Using SRQ      : OFF
  PCIe relax order: ON           Lock-free      : OFF
  ibv_wr* API     : OFF          Using DDP      : OFF
@@ -401,47 +363,134 @@ allocated 16777216 bytes of GPU buffer at 0x7fe939600000
  Mtu             : 4096[B]
  Link type       : Ethernet
  CPU freq        : 3295[MHz]
- GID index       : 0
+ GID index       : 1
  Max inline data : 0[B]
  rdma_cm QPs     : OFF
  Use ROCm memory : ON
  Data ex. method : Ethernet
 ---------------------------------------------------------------------------------------
- local address: LID 0000 QPN 0x0002 PSN 0x398b12 RKey 0x000184 VAddr 0x007fe939e00000
- GID: 254:128:00:00:00:00:00:00:06:144:129:255:254:56:231:64
- remote address: LID 0000 QPN 0x0002 PSN 0x9c4c2e RKey 0x000182 VAddr 0x007f042ac00000
- GID: 254:128:00:00:00:00:00:00:06:144:129:255:254:54:91:176
+ local address: LID 0000 QPN 0x0800 PSN 0x2cf9f2 RKey 0x0001de VAddr 0x007f9c20e00000
+ GID: 253:147:22:211:89:182:01:79:06:144:129:255:254:58:54:80
+ local address: LID 0000 QPN 0x0002 PSN 0x9541f4 RKey 0x0001de VAddr 0x007f9c21600000
+ GID: 253:147:22:211:89:182:01:79:06:144:129:255:254:58:54:80
+ local address: LID 0000 QPN 0x0801 PSN 0x2fce2e RKey 0x0001de VAddr 0x007f9c21e00000
+ GID: 253:147:22:211:89:182:01:79:06:144:129:255:254:58:54:80
+ local address: LID 0000 QPN 0x0003 PSN 0x26bce5 RKey 0x0001de VAddr 0x007f9c22600000
+ GID: 253:147:22:211:89:182:01:79:06:144:129:255:254:58:54:80
+ remote address: LID 0000 QPN 0x0002 PSN 0x9b98a6 RKey 0x0001ee VAddr 0x007f50a4e00000
+ GID: 253:147:22:211:89:182:01:77:06:144:129:255:254:54:177:120
+ remote address: LID 0000 QPN 0x0800 PSN 0x348c98 RKey 0x0001ee VAddr 0x007f50a5600000
+ GID: 253:147:22:211:89:182:01:77:06:144:129:255:254:54:177:120
+ remote address: LID 0000 QPN 0x0003 PSN 0x41ee02 RKey 0x0001ee VAddr 0x007f50a5e00000
+ GID: 253:147:22:211:89:182:01:77:06:144:129:255:254:54:177:120
+ remote address: LID 0000 QPN 0x0801 PSN 0xe6c229 RKey 0x0001ee VAddr 0x007f50a6600000
+ GID: 253:147:22:211:89:182:01:77:06:144:129:255:254:54:177:120
 ---------------------------------------------------------------------------------------
- #bytes     #iterations    BW peak[MiB/sec]    BW average[MiB/sec]   MsgRate[Mpps]
- 2          5000             6.82               6.76                 3.543784
- 4          5000             13.65              13.60                3.565549
- 8          5000             27.57              27.35                3.584287
- 16         5000             54.77              54.53                3.573972
- 32         5000             109.30             108.96               3.570471
- 64         5000             220.76             219.55               3.597148
- 128        5000             436.26             415.65               3.404981
- 256        5000             881.12             880.74               3.607493
- 512        5000             1750.74            1749.40              3.582769
- 1024       5000             3516.78            3494.28              3.578147
- 2048       5000             7002.95            6941.36              3.553975
- 4096       5000             13693.01            13639.21                    3.491638
- 8192       5000             19878.65            19871.68                    2.543574
- 16384      5000             18647.48            18645.54                    1.193314
- 32768      5000             19033.53            19032.42                    0.609037
- 65536      5000             18683.01            18682.46                    0.298919
- 131072     5000             18584.38            18583.90                    0.148671
- 262144     5000             18579.35            18579.29                    0.074317
- 524288     5000             18765.36            18765.26                    0.037531
- 1048576    5000             18635.36            18635.27                    0.018635
- 2097152    5000             18787.56            18787.52                    0.009394
- 4194304    5000             19045.85            19045.80                    0.004761
- 8388608    5000             19044.44            19044.43                    0.002381
+ #bytes     #iterations    BW peak[Gb/sec]    BW average[Gb/sec]   MsgRate[Mpps]
+ 2          20000           0.147580            0.146905            9.181552
+ 4          20000            0.30               0.30                 9.255260
+ 8          20000            0.60               0.59                 9.264019
+ 16         20000            1.19               1.19                 9.287408
+ 32         20000            2.38               2.37                 9.265968
+ 64         20000            4.78               4.76                 9.295219
+ 128        20000            9.52               9.49                 9.272243
+ 256        20000            19.05              18.99                9.270065
+ 512        20000            38.15              38.05                9.288649
+ 1024       20000            76.14              75.39                9.202821
+ 2048       20000            151.97             150.88               9.209194
+ 4096       20000            302.87             301.83               9.211057
+ 8192       20000            600.97             577.28               8.808607
+ 16384      20000            681.23             673.94               5.141754
+ 32768      20000            684.39             682.26               2.602598
+ 65536      20000            688.00             687.41               1.311139
+ 131072     20000            689.06             688.63               0.656726
+ 262144     20000            693.30             692.89               0.330395
+ 524288     20000            695.82             695.40               0.165796
+ 1048576    20000            697.11             696.64               0.083045
+ 2097152    20000            697.43             696.98               0.041543
+ 4194304    20000            697.87             697.42               0.020785
+ 8388608    20000            698.41             697.97               0.010401
 ---------------------------------------------------------------------------------------
-Completed: Tue Apr 21 08:12:57 2026
+Completed: Thu Apr 23 01:21:05 2026
 
-Total run time: 5.459s
-deallocating GPU buffer 0x7fe939600000
+Total run time: 98.662s
+deallocating GPU buffer 0x7f9c1ee00000
 
+
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+Client-side example :
+[vultr@Aliyun3 perftest]$ ./ib_write_bw -d ionic_1 -i 1 -F -x 1 -q 4 --tclass 104 -a --report_gbits -b -p 5001 --use_rocm=1 66.42.116.72
+Using sampled CPU speed 3295 MHz over reported speed 5008 MHz
+Connected: Thu Apr 23 01:20:55 2026
+
+Using ROCm Device with ID: 1, Name: AMD Instinct MI355X, PCI Bus ID: 0x15, GCN Arch: gfx950:sramecc+:xnack-
+allocated 67108864 bytes of GPU buffer at 0x7f50a2e00000
+---------------------------------------------------------------------------------------
+                    RDMA_Write Bidirectional BW Test
+ Dual-port       : OFF          Device         : ionic_1
+ Number of qps   : 4            Transport type : IB
+ Connection type : RC           Using SRQ      : OFF
+ PCIe relax order: ON           Lock-free      : OFF
+ ibv_wr* API     : OFF          Using DDP      : OFF
+ TX depth        : 128
+ CQ Moderation   : 100
+ CQE Poll Batch  : 16
+ Mtu             : 4096[B]
+ Link type       : Ethernet
+ CPU freq        : 3295[MHz]
+ GID index       : 1
+ Max inline data : 0[B]
+ rdma_cm QPs     : OFF
+ Use ROCm memory : ON
+ Data ex. method : Ethernet
+---------------------------------------------------------------------------------------
+ local address: LID 0000 QPN 0x0002 PSN 0x9b98a6 RKey 0x0001ee VAddr 0x007f50a4e00000
+ GID: 253:147:22:211:89:182:01:77:06:144:129:255:254:54:177:120
+ local address: LID 0000 QPN 0x0800 PSN 0x348c98 RKey 0x0001ee VAddr 0x007f50a5600000
+ GID: 253:147:22:211:89:182:01:77:06:144:129:255:254:54:177:120
+ local address: LID 0000 QPN 0x0003 PSN 0x41ee02 RKey 0x0001ee VAddr 0x007f50a5e00000
+ GID: 253:147:22:211:89:182:01:77:06:144:129:255:254:54:177:120
+ local address: LID 0000 QPN 0x0801 PSN 0xe6c229 RKey 0x0001ee VAddr 0x007f50a6600000
+ GID: 253:147:22:211:89:182:01:77:06:144:129:255:254:54:177:120
+ remote address: LID 0000 QPN 0x0800 PSN 0x2cf9f2 RKey 0x0001de VAddr 0x007f9c20e00000
+ GID: 253:147:22:211:89:182:01:79:06:144:129:255:254:58:54:80
+ remote address: LID 0000 QPN 0x0002 PSN 0x9541f4 RKey 0x0001de VAddr 0x007f9c21600000
+ GID: 253:147:22:211:89:182:01:79:06:144:129:255:254:58:54:80
+ remote address: LID 0000 QPN 0x0801 PSN 0x2fce2e RKey 0x0001de VAddr 0x007f9c21e00000
+ GID: 253:147:22:211:89:182:01:79:06:144:129:255:254:58:54:80
+ remote address: LID 0000 QPN 0x0003 PSN 0x26bce5 RKey 0x0001de VAddr 0x007f9c22600000
+ GID: 253:147:22:211:89:182:01:79:06:144:129:255:254:58:54:80
+---------------------------------------------------------------------------------------
+ #bytes     #iterations    BW peak[Gb/sec]    BW average[Gb/sec]   MsgRate[Mpps]
+ 2          20000           0.147580            0.146905            9.181552
+ 4          20000            0.30               0.30                 9.255260
+ 8          20000            0.60               0.59                 9.264019
+ 16         20000            1.19               1.19                 9.287408
+ 32         20000            2.38               2.37                 9.265968
+ 64         20000            4.78               4.76                 9.295219
+ 128        20000            9.52               9.49                 9.272243
+ 256        20000            19.05              18.99                9.270065
+ 512        20000            38.15              38.05                9.288649
+ 1024       20000            76.14              75.39                9.202821
+ 2048       20000            151.97             150.88               9.209194
+ 4096       20000            302.87             301.83               9.211057
+ 8192       20000            600.97             577.28               8.808607
+ 16384      20000            681.23             673.94               5.141754
+ 32768      20000            684.39             682.26               2.602598
+ 65536      20000            688.00             687.41               1.311139
+ 131072     20000            689.06             688.63               0.656726
+ 262144     20000            693.30             692.89               0.330395
+ 524288     20000            695.82             695.40               0.165796
+ 1048576    20000            697.11             696.64               0.083045
+ 2097152    20000            697.43             696.98               0.041543
+ 4194304    20000            697.87             697.42               0.020785
+ 8388608    20000            698.41             697.97               0.010401
+---------------------------------------------------------------------------------------
+Completed: Thu Apr 23 01:21:05 2026
+
+Total run time: 10.032s
+deallocating GPU buffer 0x7f50a2e00000
 
 
 ```

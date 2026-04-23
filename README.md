@@ -507,13 +507,13 @@ $ ./run_inter_mori.sh
 
 ## Test 11. Multi Node Collective Communication	RCCL - AllReduce Bandwidth
 
-For building the docker clone the below repo : 
+For building the docker clone the below repo. Do this on both the nodes you are trying to run the RCCL multi-node test : 
 ```
 git clone https://github.com/ROCm/rocm-systems.git -b users/atulkulk/mndock
 cd /home/vultr/code/rocm-systems/projects/rccl/docker
 time GPU_TARGETS="gfx950" python3 -m mnctl --launch-all --nic-type ainic --volume /home/vultr/fjw/drivers-linux:/root/cache/drivers-linux --post-setup post-setup/ --hostfile hostfile --dockerfile Dockerfile.Multinode.ALinux3 --verbose --rebuild 2>&1 | tee blddemo.log
 ```
-How to run 
+How to run ( This step required only on one node, ensure that docker is running on both nodes) 
 ```
 docker exec -it rccl-mn /bin/bash
 
@@ -613,13 +613,13 @@ Librccl path : /opt/rocm/lib/librccl.so.1
 
 ## Test 12. Multi Node Collective Communication	RCCL - AlltoAll Bandwidth
 
-For building the docker clone the below repo : 
+For building the docker clone the below repo .  Do this on both the nodes you are trying to run the RCCL multi-node test : 
 ```
 git clone https://github.com/ROCm/rocm-systems.git -b users/atulkulk/mndock
 cd /home/vultr/code/rocm-systems/projects/rccl/docker
 time GPU_TARGETS="gfx950" python3 -m mnctl --launch-all --nic-type ainic --volume /home/vultr/fjw/drivers-linux:/root/cache/drivers-linux --post-setup post-setup/ --hostfile hostfile --dockerfile Dockerfile.Multinode.ALinux3 --verbose --rebuild 2>&1 | tee blddemo.log
 ```
-How to run 
+How to run ( This step required only on one node, ensure that docker is running on both nodes) 
 ```
 docker exec -it rccl-mn /bin/bash
 

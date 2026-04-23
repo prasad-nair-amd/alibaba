@@ -20,14 +20,12 @@ docker run -d \
   rocm/ali-private:alinux3_rocm7.2.1.76_cp310_torch2.9.1_20260331 sleep infinity
 
 docker ps | grep mori
-
 echo "Start running IntraNode Mori Test:"
 docker exec -it mori bash -c "/root/cache/run_mori.sh"
 echo "Installing AINIC Driver inside of docker"
 docker exec -it mori bash -c "/root/cache/install_driver.sh"
 echo "Start running InterNode Mori Test:"
-docker exec -it mori bash -c "/root/cache/r2.sh"
-
+docker exec -it mori bash -c "/root/cache/r1.sh"
 
 #echo "Stop amd rm the docker mori"
 #docker stop  mori

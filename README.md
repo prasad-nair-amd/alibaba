@@ -122,6 +122,60 @@ sudo docker pull prasadnairamd/rccl-tests:latest
 
 
 docker run --rm   --device=/dev/kfd   --device=/dev/dri   --group-add video   --ipc=host   --network=host   --cap-add=SYS_PTRACE   --security-opt  seccomp=unconfined prasadnairamd/rccl-tests   ./build/all_reduce_perf -f 2 -g 8 -b 4 -e 1G
+
+[vultr@Aliyun3 ~]$ docker run --rm   --device=/dev/kfd   --device=/dev/dri   --group-add video   --ipc=host   --network=host   --cap-add=SYS_PTRACE   --security-opt  seccomp=unconfined prasadnairamd/rccl-tests   ./build/all_reduce_perf -f 2 -g 8 -b 4 -e 1G
+# rccl-tests version 2.17.9-develop:2596ca5f71 rccl-headers=22803 rccl-library=22707
+# Collective test starting: all_reduce_perf
+# nThread 1 nGpus 8 minBytes 4 maxBytes 1073741824 step: 2(factor) warmup iters: 1 iters: 20 agg iters: 1 validation: 1 graph: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid      1 on    Aliyun3 device  0 [0000:05:00] AMD Radeon Graphics
+#  Rank  1 Group  0 Pid      1 on    Aliyun3 device  1 [0000:15:00] AMD Radeon Graphics
+#  Rank  2 Group  0 Pid      1 on    Aliyun3 device  2 [0000:65:00] AMD Radeon Graphics
+#  Rank  3 Group  0 Pid      1 on    Aliyun3 device  3 [0000:75:00] AMD Radeon Graphics
+#  Rank  4 Group  0 Pid      1 on    Aliyun3 device  4 [0000:85:00] AMD Radeon Graphics
+#  Rank  5 Group  0 Pid      1 on    Aliyun3 device  5 [0000:95:00] AMD Radeon Graphics
+#  Rank  6 Group  0 Pid      1 on    Aliyun3 device  6 [0000:e5:00] AMD Radeon Graphics
+#  Rank  7 Group  0 Pid      1 on    Aliyun3 device  7 [0000:f5:00] AMD Radeon Graphics
+#
+#                                                              out-of-place                       in-place
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)
+           4             1     float     sum      -1    42.02    0.00    0.00       0    37.48    0.00    0.00       0
+           8             2     float     sum      -1    35.49    0.00    0.00       0    34.42    0.00    0.00       0
+          16             4     float     sum      -1    35.80    0.00    0.00       0    34.39    0.00    0.00       0
+          32             8     float     sum      -1    35.99    0.00    0.00       0    34.62    0.00    0.00       0
+          64            16     float     sum      -1    35.79    0.00    0.00       0    34.45    0.00    0.00       0
+         128            32     float     sum      -1    35.83    0.00    0.01       0    34.34    0.00    0.01       0
+         256            64     float     sum      -1    35.79    0.01    0.01       0    34.32    0.01    0.01       0
+         512           128     float     sum      -1    34.36    0.01    0.03       0    34.48    0.01    0.03       0
+        1024           256     float     sum      -1    34.29    0.03    0.05       0    33.52    0.03    0.05       0
+        2048           512     float     sum      -1    33.50    0.06    0.11       0    34.73    0.06    0.10       0
+        4096          1024     float     sum      -1    32.97    0.12    0.22       0    33.08    0.12    0.22       0
+        8192          2048     float     sum      -1    31.98    0.26    0.45       0    33.33    0.25    0.43       0
+       16384          4096     float     sum      -1    33.09    0.50    0.87       0    33.20    0.49    0.86       0
+       32768          8192     float     sum      -1    32.95    0.99    1.74       0    34.55    0.95    1.66       0
+       65536         16384     float     sum      -1    33.44    1.96    3.43       0    32.07    2.04    3.58       0
+      131072         32768     float     sum      -1    37.83    3.46    6.06       0    38.94    3.37    5.89       0
+      262144         65536     float     sum      -1    38.79    6.76   11.83       0    37.17    7.05   12.34       0
+      524288        131072     float     sum      -1    39.01   13.44   23.52       0    41.67   12.58   22.02       0
+     1048576        262144     float     sum      -1    37.37   28.06   49.11       0    37.64   27.86   48.75       0
+     2097152        524288     float     sum      -1    39.65   52.89   92.55       0    39.43   53.18   93.07       0
+     4194304       1048576     float     sum      -1    47.95   87.47  153.07       0    48.54   86.41  151.22       0
+     8388608       2097152     float     sum      -1    71.12  117.94  206.40       0    71.13  117.94  206.39       0
+    16777216       4194304     float     sum      -1   116.74  143.71  251.49       0   118.08  142.08  248.64       0
+    33554432       8388608     float     sum      -1   183.45  182.91  320.09       0   182.32  184.04  322.07       0
+    67108864      16777216     float     sum      -1   324.09  207.07  362.37       0   323.75  207.29  362.76       0
+   134217728      33554432     float     sum      -1   611.47  219.50  384.13       0   611.59  219.46  384.05       0
+   268435456      67108864     float     sum      -1  1188.45  225.87  395.27       0  1190.90  225.41  394.46       0
+   536870912     134217728     float     sum      -1  2351.27  228.33  399.58       0  2347.45  228.70  400.23       0
+  1073741824     268435456     float     sum      -1  4667.81  230.03  402.55       0  4675.42  229.66  401.90       0
+
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 105.615
+#
+# Collective test concluded: all_reduce_perf
+
 ```
 
 ## Test 6. Single Node Collective Communication	RCCL - All2All Performance
@@ -130,6 +184,57 @@ sudo docker pull prasadnairamd/rccl-tests:latest
 
 
 docker run --rm   --device=/dev/kfd   --device=/dev/dri   --group-add video   --ipc=host   --network=host   --cap-add=SYS_PTRACE   --security-opt  seccomp=unconfined prasadnairamd/rccl-tests   ./build/alltoall_perf -b 8 -e 128M -f 2 -g 8
+
+[vultr@Aliyun3 ~]$ docker run --rm   --device=/dev/kfd   --device=/dev/dri   --group-add video   --ipc=host   --network=host   --cap-add=SYS_PTRACE   --security-opt  seccomp=unconfined prasadnairamd/rccl-tests   ./build/alltoall_perf -b 8 -e 128M -f 2 -g 8
+# rccl-tests version 2.17.9-develop:2596ca5f71 rccl-headers=22803 rccl-library=22707
+# Collective test starting: alltoall_perf
+# nThread 1 nGpus 8 minBytes 8 maxBytes 134217728 step: 2(factor) warmup iters: 1 iters: 20 agg iters: 1 validation: 1 graph: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid      1 on    Aliyun3 device  0 [0000:05:00] AMD Radeon Graphics
+#  Rank  1 Group  0 Pid      1 on    Aliyun3 device  1 [0000:15:00] AMD Radeon Graphics
+#  Rank  2 Group  0 Pid      1 on    Aliyun3 device  2 [0000:65:00] AMD Radeon Graphics
+#  Rank  3 Group  0 Pid      1 on    Aliyun3 device  3 [0000:75:00] AMD Radeon Graphics
+#  Rank  4 Group  0 Pid      1 on    Aliyun3 device  4 [0000:85:00] AMD Radeon Graphics
+#  Rank  5 Group  0 Pid      1 on    Aliyun3 device  5 [0000:95:00] AMD Radeon Graphics
+#  Rank  6 Group  0 Pid      1 on    Aliyun3 device  6 [0000:e5:00] AMD Radeon Graphics
+#  Rank  7 Group  0 Pid      1 on    Aliyun3 device  7 [0000:f5:00] AMD Radeon Graphics
+#
+#                                                              out-of-place                       in-place
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)
+           0             0     float    none      -1     0.94    0.00    0.00       0     0.76    0.00    0.00    N/A
+           0             0     float    none      -1     0.73    0.00    0.00       0     0.72    0.00    0.00    N/A
+           0             0     float    none      -1     0.79    0.00    0.00       0     0.82    0.00    0.00    N/A
+           0             0     float    none      -1     0.72    0.00    0.00       0     0.82    0.00    0.00    N/A
+         128             4     float    none      -1    40.87    0.00    0.00       0    59.46    0.00    0.00    N/A
+         256             8     float    none      -1    30.80    0.01    0.01       0    47.19    0.01    0.00    N/A
+         512            16     float    none      -1    31.13    0.02    0.01       0    47.45    0.01    0.01    N/A
+        1024            32     float    none      -1    29.83    0.03    0.03       0    46.95    0.02    0.02    N/A
+        2048            64     float    none      -1    29.78    0.07    0.06       0    48.13    0.04    0.04    N/A
+        4096           128     float    none      -1    30.82    0.13    0.12       0    46.50    0.09    0.08    N/A
+        8192           256     float    none      -1    29.89    0.27    0.24       0    46.53    0.18    0.15    N/A
+       16384           512     float    none      -1    33.01    0.50    0.43       0    47.67    0.34    0.30    N/A
+       32768          1024     float    none      -1    32.79    1.00    0.87       0    47.85    0.68    0.60    N/A
+       65536          2048     float    none      -1    32.40    2.02    1.77       0    50.74    1.29    1.13    N/A
+      131072          4096     float    none      -1    31.57    4.15    3.63       0    51.60    2.54    2.22    N/A
+      262144          8192     float    none      -1    37.49    6.99    6.12       0    57.08    4.59    4.02    N/A
+      524288         16384     float    none      -1    36.50   14.36   12.57       0    57.38    9.14    8.00    N/A
+     1048576         32768     float    none      -1    37.45   28.00   24.50       0    49.02   21.39   18.72    N/A
+     2097152         65536     float    none      -1    37.20   56.38   49.33       0    53.73   39.03   34.15    N/A
+     4194304        131072     float    none      -1    36.10  116.17  101.65       0    57.70   72.69   63.61    N/A
+     8388608        262144     float    none      -1    38.98  215.23  188.32       0    58.33  143.80  125.83    N/A
+    16777216        524288     float    none      -1    59.45  282.19  246.91       0    62.17  269.87  236.14    N/A
+    33554432       1048576     float    none      -1   101.79  329.63  288.43       0   109.36  306.83  268.48    N/A
+    67108864       2097152     float    none      -1   196.69  341.19  298.54       0   199.69  336.06  294.05    N/A
+   134217728       4194304     float    none      -1   364.47  368.25  322.22       0   371.15  361.62  316.42    N/A
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 58.3947
+#
+# Collective test concluded: alltoall_perf
+#
+
+
 ```
 
 ## Test 7. Single Node Collective Communication	Mori-EP

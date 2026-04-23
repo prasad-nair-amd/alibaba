@@ -507,4 +507,35 @@ $ ./run_inter_mori.sh
 
 ## Test 11. Multi Node Collective Communication	RCCL - AllReduce Bandwidth
 
+For building the docker clone the below repo : 
+```
+git clone https://github.com/ROCm/rocm-systems.git -b users/atulkulk/mndock
+cd /home/vultr/code/rocm-systems/projects/rccl/docker
+time GPU_TARGETS="gfx950" python3 -m mnctl --launch-all --nic-type ainic --volume /home/vultr/fjw/drivers-linux:/root/cache/drivers-linux --post-setup post-setup/ --hostfile hostfile --dockerfile Dockerfile.Multinode.ALinux3 --verbose --rebuild 2>&1 | tee blddemo.log
+```
+How to run 
+```
+docker exec -it rccl-mn /bin/bash
+
+[root@Aliyun3 workspace]#  mpirun --mca btl_tcp_if_include eth1 --mca oob_tcp_if_include eth1 --hostfile hostfile -np 16 --allow-run-as-root -x NCCL_SOCKET_IFNAME=eth1 -x NCCL_IB_GID_INDEX=1 -x NCCL_GDR_FLUSH_DISABLE=1  -x NCCL_GDRCOPY_ENABLE=0 -x NCCL_IB_HCA=ionic_0,ionic_1,ionic_2,ionic_3,ionic_4,ionic_5,ionic_6,ionic_7 --mca btl ^vader,openib -x NCCL_IB_QPS_PER_CONNECTION=2 -x NCCL_IB_TC=104 -x NCCL_IB_FIFO_TC=184  -x NCCL_IGNORE_CPU_AFFINITY=1  -x NCCL_DEBUG=VERSION -x NET_OPTIONAL_RECV_COMPLETION=1  -x HSA_NO_SCRATCH_RECLAIM=1 -x RCCL_GDR_FLUSH_GPU_MEM_NO_RELAXED_ORDERING=0 -x NCCL_TOPO_DUMP_FILE=/tmp/system_run2.txt -x NCCL_IB_USE_INLINE=1 -x IONIC_LOCKFREE=all  -x NCCL_PXN_DISABLE=0 /workspace/rocm-systems/projects/rccl-tests/build/all_reduce_perf -b 16 -e 16G -f 2 -g 1 -n 20 -c 1 -w 5
+
+```
+
+
 ## Test 12. Multi Node Collective Communication	RCCL - AlltoAll Bandwidth
+
+For building the docker clone the below repo : 
+```
+git clone https://github.com/ROCm/rocm-systems.git -b users/atulkulk/mndock
+cd /home/vultr/code/rocm-systems/projects/rccl/docker
+time GPU_TARGETS="gfx950" python3 -m mnctl --launch-all --nic-type ainic --volume /home/vultr/fjw/drivers-linux:/root/cache/drivers-linux --post-setup post-setup/ --hostfile hostfile --dockerfile Dockerfile.Multinode.ALinux3 --verbose --rebuild 2>&1 | tee blddemo.log
+```
+How to run 
+```
+docker exec -it rccl-mn /bin/bash
+
+[root@Aliyun3 workspace]#  mpirun --mca btl_tcp_if_include eth1 --mca oob_tcp_if_include eth1 --hostfile hostfile -np 16 --allow-run-as-root -x NCCL_SOCKET_IFNAME=eth1 -x NCCL_IB_GID_INDEX=1 -x NCCL_GDR_FLUSH_DISABLE=1  -x NCCL_GDRCOPY_ENABLE=0 -x NCCL_IB_HCA=ionic_0,ionic_1,ionic_2,ionic_3,ionic_4,ionic_5,ionic_6,ionic_7 --mca btl ^vader,openib -x NCCL_IB_QPS_PER_CONNECTION=2 -x NCCL_IB_TC=104 -x NCCL_IB_FIFO_TC=184  -x NCCL_IGNORE_CPU_AFFINITY=1  -x NCCL_DEBUG=VERSION -x NET_OPTIONAL_RECV_COMPLETION=1  -x HSA_NO_SCRATCH_RECLAIM=1 -x RCCL_GDR_FLUSH_GPU_MEM_NO_RELAXED_ORDERING=0 -x NCCL_TOPO_DUMP_FILE=/tmp/system_run2.txt -x NCCL_IB_USE_INLINE=1 -x IONIC_LOCKFREE=all  -x NCCL_PXN_DISABLE=0 /workspace/rocm-systems/projects/rccl-tests/build/alltoall_perf -b 16 -e 16G -f 2 -g 1 -n 20 -c 1 -w 5
+
+```
+
+

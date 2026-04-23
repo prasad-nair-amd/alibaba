@@ -517,7 +517,96 @@ How to run
 ```
 docker exec -it rccl-mn /bin/bash
 
-[root@Aliyun3 workspace]#  mpirun --mca btl_tcp_if_include eth1 --mca oob_tcp_if_include eth1 --hostfile hostfile -np 16 --allow-run-as-root -x NCCL_SOCKET_IFNAME=eth1 -x NCCL_IB_GID_INDEX=1 -x NCCL_GDR_FLUSH_DISABLE=1  -x NCCL_GDRCOPY_ENABLE=0 -x NCCL_IB_HCA=ionic_0,ionic_1,ionic_2,ionic_3,ionic_4,ionic_5,ionic_6,ionic_7 --mca btl ^vader,openib -x NCCL_IB_QPS_PER_CONNECTION=2 -x NCCL_IB_TC=104 -x NCCL_IB_FIFO_TC=184  -x NCCL_IGNORE_CPU_AFFINITY=1  -x NCCL_DEBUG=VERSION -x NET_OPTIONAL_RECV_COMPLETION=1  -x HSA_NO_SCRATCH_RECLAIM=1 -x RCCL_GDR_FLUSH_GPU_MEM_NO_RELAXED_ORDERING=0 -x NCCL_TOPO_DUMP_FILE=/tmp/system_run2.txt -x NCCL_IB_USE_INLINE=1 -x IONIC_LOCKFREE=all  -x NCCL_PXN_DISABLE=0 /workspace/rocm-systems/projects/rccl-tests/build/all_reduce_perf -b 16 -e 16G -f 2 -g 1 -n 20 -c 1 -w 5
+create a hostfile with following entry
+[root@Aliyun3 workspace]# vim hostfile
+66.42.116.72 slots=8
+45.76.25.46 slots=8
+
+running the test
+
+[root@Aliyun3 workspace]# mpirun --mca btl_tcp_if_include eth1 --mca oob_tcp_if_include eth1 --hostfile hostfile -np 16 --allow-run-as-root -x NCCL_SOCKET_IFNAME=eth1 -x NCCL_IB_GID_INDEX=1 -x NCCL_GDR_FLUSH_DISABLE=1  -x NCCL_GDRCOPY_ENABLE=0 -x NCCL_IB_HCA=ionic_0,ionic_1,ionic_2,ionic_3,ionic_4,ionic_5,ionic_6,ionic_7 --mca btl ^vader,openib -x NCCL_IB_QPS_PER_CONNECTION=2 -x NCCL_IB_TC=104 -x NCCL_IB_FIFO_TC=184  -x NCCL_IGNORE_CPU_AFFINITY=1  -x NCCL_DEBUG=VERSION -x NET_OPTIONAL_RECV_COMPLETION=1  -x HSA_NO_SCRATCH_RECLAIM=1 -x RCCL_GDR_FLUSH_GPU_MEM_NO_RELAXED_ORDERING=0 -x NCCL_TOPO_DUMP_FILE=/tmp/system_run2.txt -x NCCL_IB_USE_INLINE=1 -x IONIC_LOCKFREE=all  -x NCCL_PXN_DISABLE=0 /workspace/rocm-systems/projects/rccl-tests/build/all_reduce_perf -b 16 -e 16G -f 2 -g 1 -n 20 -c 1 -w 5
+[1776961424.585035] [Aliyun1:3315 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776961424.585035] [Aliyun1:3315 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776961424.640401] [Aliyun1:3316 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776961424.640401] [Aliyun1:3316 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776961424.745584] [Aliyun1:3319 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776961424.745584] [Aliyun1:3319 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776961424.897036] [Aliyun1:3320 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776961424.897036] [Aliyun1:3320 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776961424.970278] [Aliyun1:3317 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776961424.970278] [Aliyun1:3317 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776961424.994705] [Aliyun1:3322 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776961424.994705] [Aliyun1:3322 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776961425.224937] [Aliyun1:3321 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776961425.224937] [Aliyun1:3321 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776961425.239146] [Aliyun1:3318 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776961425.239146] [Aliyun1:3318 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+# rccl-tests version 2.17.9-develop:4a65e8d rccl-headers=22707 rccl-library=22707
+# Collective test starting: all_reduce_perf
+# nThread 1 nGpus 1 minBytes 16 maxBytes 17179869184 step: 2(factor) warmup iters: 5 iters: 20 agg iters: 1 validation: 1 graph: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid   3379 on    Aliyun3 device  0 [0000:05:00] AMD Radeon Graphics
+#  Rank  1 Group  0 Pid   3380 on    Aliyun3 device  1 [0000:15:00] AMD Radeon Graphics
+#  Rank  2 Group  0 Pid   3381 on    Aliyun3 device  2 [0000:65:00] AMD Radeon Graphics
+#  Rank  3 Group  0 Pid   3382 on    Aliyun3 device  3 [0000:75:00] AMD Radeon Graphics
+#  Rank  4 Group  0 Pid   3383 on    Aliyun3 device  4 [0000:85:00] AMD Radeon Graphics
+#  Rank  5 Group  0 Pid   3384 on    Aliyun3 device  5 [0000:95:00] AMD Radeon Graphics
+#  Rank  6 Group  0 Pid   3385 on    Aliyun3 device  6 [0000:e5:00] AMD Radeon Graphics
+#  Rank  7 Group  0 Pid   3386 on    Aliyun3 device  7 [0000:f5:00] AMD Radeon Graphics
+#  Rank  8 Group  0 Pid   3315 on    Aliyun1 device  0 [0000:05:00] AMD Radeon Graphics
+#  Rank  9 Group  0 Pid   3316 on    Aliyun1 device  1 [0000:15:00] AMD Radeon Graphics
+#  Rank 10 Group  0 Pid   3317 on    Aliyun1 device  2 [0000:65:00] AMD Radeon Graphics
+#  Rank 11 Group  0 Pid   3318 on    Aliyun1 device  3 [0000:75:00] AMD Radeon Graphics
+#  Rank 12 Group  0 Pid   3319 on    Aliyun1 device  4 [0000:85:00] AMD Radeon Graphics
+#  Rank 13 Group  0 Pid   3320 on    Aliyun1 device  5 [0000:95:00] AMD Radeon Graphics
+#  Rank 14 Group  0 Pid   3321 on    Aliyun1 device  6 [0000:e5:00] AMD Radeon Graphics
+#  Rank 15 Group  0 Pid   3322 on    Aliyun1 device  7 [0000:f5:00] AMD Radeon Graphics
+RCCL version : 2.27.7-HEAD:96a25b5
+HIP version  : 7.2.53211-671d39a71e
+ROCm version : 7.2.2.0-86-671d39a71e
+Hostname     : Aliyun3
+Librccl path : /opt/rocm/lib/librccl.so.1
+#
+#                                                              out-of-place                       in-place
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)
+          16             4     float     sum      -1    37.35    0.00    0.00       0    37.32    0.00    0.00       0
+          32             8     float     sum      -1    36.56    0.00    0.00       0    37.43    0.00    0.00       0
+          64            16     float     sum      -1    37.86    0.00    0.00       0    37.32    0.00    0.00       0
+         128            32     float     sum      -1    38.28    0.00    0.01       0    37.73    0.00    0.01       0
+         256            64     float     sum      -1    38.51    0.01    0.01       0    37.91    0.01    0.01       0
+         512           128     float     sum      -1    38.55    0.01    0.02       0    38.47    0.01    0.02       0
+        1024           256     float     sum      -1    42.14    0.02    0.05       0    41.79    0.02    0.05       0
+        2048           512     float     sum      -1    44.28    0.05    0.09       0    43.77    0.05    0.09       0
+        4096          1024     float     sum      -1    46.88    0.09    0.16       0    46.16    0.09    0.17       0
+        8192          2048     float     sum      -1    45.68    0.18    0.34       0    46.13    0.18    0.33       0
+       16384          4096     float     sum      -1    46.65    0.35    0.66       0    45.93    0.36    0.67       0
+       32768          8192     float     sum      -1    46.68    0.70    1.32       0    46.70    0.70    1.32       0
+       65536         16384     float     sum      -1    49.99    1.31    2.46       0    49.59    1.32    2.48       0
+      131072         32768     float     sum      -1    51.33    2.55    4.79       0    51.76    2.53    4.75       0
+      262144         65536     float     sum      -1    60.19    4.35    8.17       0    59.32    4.42    8.29       0
+      524288        131072     float     sum      -1    62.27    8.42   15.79       0    61.64    8.51   15.95       0
+     1048576        262144     float     sum      -1    69.03   15.19   28.48       0    68.26   15.36   28.80       0
+     2097152        524288     float     sum      -1    76.38   27.46   51.48       0    75.08   27.93   52.37       0
+     4194304       1048576     float     sum      -1    88.58   47.35   88.78       0    89.37   46.93   88.00       0
+     8388608       2097152     float     sum      -1   110.24   76.09  142.67       0   109.71   76.46  143.36       0
+    16777216       4194304     float     sum      -1   177.14   94.71  177.58       0   176.17   95.23  178.56       0
+    33554432       8388608     float     sum      -1   262.18  127.98  239.97       0   261.63  128.25  240.47       0
+    67108864      16777216     float     sum      -1   439.32  152.76  286.42       0   438.96  152.88  286.65       0
+   134217728      33554432     float     sum      -1   860.65  155.95  292.41       0   853.17  157.32  294.97       0
+   268435456      67108864     float     sum      -1  1355.74  198.00  371.25       0  1355.29  198.06  371.37       0
+   536870912     134217728     float     sum      -1  2668.77  201.17  377.19       0  2668.08  201.22  377.29       0
+  1073741824     268435456     float     sum      -1  5302.00  202.52  379.72       0  5287.42  203.07  380.77       0
+  2147483648     536870912     float     sum      -1  10580.6  202.96  380.56       0  10563.5  203.29  381.17       0
+  4294967296    1073741824     float     sum      -1  21033.4  204.20  382.87       0  21035.3  204.18  382.84       0
+  8589934592    2147483648     float     sum      -1  41862.6  205.19  384.74       0  41865.2  205.18  384.71       0
+ 17179869184    4294967296     float     sum      -1  83456.7  205.85  385.98       0  83462.8  205.84  385.95       0
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 129.28
+#
+# Collective test concluded: all_reduce_perf
+
 
 ```
 
@@ -534,8 +623,100 @@ How to run
 ```
 docker exec -it rccl-mn /bin/bash
 
+create a hostfile with following entry
+[root@Aliyun3 workspace]# vim hostfile
+66.42.116.72 slots=8
+45.76.25.46 slots=8
+
+running the test
 [root@Aliyun3 workspace]#  mpirun --mca btl_tcp_if_include eth1 --mca oob_tcp_if_include eth1 --hostfile hostfile -np 16 --allow-run-as-root -x NCCL_SOCKET_IFNAME=eth1 -x NCCL_IB_GID_INDEX=1 -x NCCL_GDR_FLUSH_DISABLE=1  -x NCCL_GDRCOPY_ENABLE=0 -x NCCL_IB_HCA=ionic_0,ionic_1,ionic_2,ionic_3,ionic_4,ionic_5,ionic_6,ionic_7 --mca btl ^vader,openib -x NCCL_IB_QPS_PER_CONNECTION=2 -x NCCL_IB_TC=104 -x NCCL_IB_FIFO_TC=184  -x NCCL_IGNORE_CPU_AFFINITY=1  -x NCCL_DEBUG=VERSION -x NET_OPTIONAL_RECV_COMPLETION=1  -x HSA_NO_SCRATCH_RECLAIM=1 -x RCCL_GDR_FLUSH_GPU_MEM_NO_RELAXED_ORDERING=0 -x NCCL_TOPO_DUMP_FILE=/tmp/system_run2.txt -x NCCL_IB_USE_INLINE=1 -x IONIC_LOCKFREE=all  -x NCCL_PXN_DISABLE=0 /workspace/rocm-systems/projects/rccl-tests/build/alltoall_perf -b 16 -e 16G -f 2 -g 1 -n 20 -c 1 -w 5
+[1776962610.613053] [Aliyun1:3557 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776962610.613053] [Aliyun1:3557 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776962610.834868] [Aliyun1:3561 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776962610.834868] [Aliyun1:3561 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776962610.887749] [Aliyun1:3556 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776962610.887749] [Aliyun1:3556 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776962610.965610] [Aliyun1:3560 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776962610.965610] [Aliyun1:3560 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776962611.086010] [Aliyun1:3554 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776962611.086010] [Aliyun1:3554 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776962611.100560] [Aliyun1:3555 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776962611.100560] [Aliyun1:3555 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776962611.240006] [Aliyun1:3559 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776962611.240006] [Aliyun1:3559 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+[1776962611.251829] [Aliyun1:3558 :0]          parser.c:2033 UCX  WARN  unused environment variable: UCX_PREFIX
+[1776962611.251829] [Aliyun1:3558 :0]          parser.c:2033 UCX  WARN  (set UCX_WARN_UNUSED_ENV_VARS=n to suppress this warning)
+# rccl-tests version 2.17.9-develop:4a65e8d rccl-headers=22707 rccl-library=22707
+# Collective test starting: alltoall_perf
+# nThread 1 nGpus 1 minBytes 16 maxBytes 17179869184 step: 2(factor) warmup iters: 5 iters: 20 agg iters: 1 validation: 1 graph: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid   3625 on    Aliyun3 device  0 [0000:05:00] AMD Radeon Graphics
+#  Rank  1 Group  0 Pid   3626 on    Aliyun3 device  1 [0000:15:00] AMD Radeon Graphics
+#  Rank  2 Group  0 Pid   3627 on    Aliyun3 device  2 [0000:65:00] AMD Radeon Graphics
+#  Rank  3 Group  0 Pid   3628 on    Aliyun3 device  3 [0000:75:00] AMD Radeon Graphics
+#  Rank  4 Group  0 Pid   3629 on    Aliyun3 device  4 [0000:85:00] AMD Radeon Graphics
+#  Rank  5 Group  0 Pid   3630 on    Aliyun3 device  5 [0000:95:00] AMD Radeon Graphics
+#  Rank  6 Group  0 Pid   3631 on    Aliyun3 device  6 [0000:e5:00] AMD Radeon Graphics
+#  Rank  7 Group  0 Pid   3632 on    Aliyun3 device  7 [0000:f5:00] AMD Radeon Graphics
+#  Rank  8 Group  0 Pid   3554 on    Aliyun1 device  0 [0000:05:00] AMD Radeon Graphics
+#  Rank  9 Group  0 Pid   3555 on    Aliyun1 device  1 [0000:15:00] AMD Radeon Graphics
+#  Rank 10 Group  0 Pid   3556 on    Aliyun1 device  2 [0000:65:00] AMD Radeon Graphics
+#  Rank 11 Group  0 Pid   3557 on    Aliyun1 device  3 [0000:75:00] AMD Radeon Graphics
+#  Rank 12 Group  0 Pid   3558 on    Aliyun1 device  4 [0000:85:00] AMD Radeon Graphics
+#  Rank 13 Group  0 Pid   3559 on    Aliyun1 device  5 [0000:95:00] AMD Radeon Graphics
+#  Rank 14 Group  0 Pid   3560 on    Aliyun1 device  6 [0000:e5:00] AMD Radeon Graphics
+#  Rank 15 Group  0 Pid   3561 on    Aliyun1 device  7 [0000:f5:00] AMD Radeon Graphics
+RCCL version : 2.27.7-HEAD:96a25b5
+HIP version  : 7.2.53211-671d39a71e
+ROCm version : 7.2.2.0-86-671d39a71e
+Hostname     : Aliyun3
+Librccl path : /opt/rocm/lib/librccl.so.1
+#
+#                                                              out-of-place                       in-place
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)
+           0             0     float    none      -1     0.06    0.00    0.00       0     0.04    0.00    0.00    N/A
+           0             0     float    none      -1     0.04    0.00    0.00       0     0.04    0.00    0.00    N/A
+           0             0     float    none      -1     0.04    0.00    0.00       0     0.04    0.00    0.00    N/A
+           0             0     float    none      -1     0.04    0.00    0.00       0     0.04    0.00    0.00    N/A
+         256             4     float    none      -1    38.61    0.01    0.01       0    37.29    0.01    0.01    N/A
+         512             8     float    none      -1    39.15    0.01    0.01       0    37.41    0.01    0.01    N/A
+        1024            16     float    none      -1    37.45    0.03    0.03       0    61.84    0.02    0.02    N/A
+        2048            32     float    none      -1    37.35    0.05    0.05       0    38.31    0.05    0.05    N/A
+        4096            64     float    none      -1    38.75    0.11    0.10       0    37.73    0.11    0.10    N/A
+        8192           128     float    none      -1    37.85    0.22    0.20       0    38.77    0.21    0.20    N/A
+       16384           256     float    none      -1    34.52    0.47    0.44       0    35.31    0.46    0.44    N/A
+       32768           512     float    none      -1    36.62    0.89    0.84       0    35.34    0.93    0.87    N/A
+       65536          1024     float    none      -1    36.97    1.77    1.66       0    36.43    1.80    1.69    N/A
+      131072          2048     float    none      -1    36.78    3.56    3.34       0    38.77    3.38    3.17    N/A
+      262144          4096     float    none      -1    40.67    6.45    6.04       0    40.13    6.53    6.12    N/A
+      524288          8192     float    none      -1    45.42   11.54   10.82       0    45.51   11.52   10.80    N/A
+     1048576         16384     float    none      -1    54.99   19.07   17.88       0    55.90   18.76   17.59    N/A
+     2097152         32768     float    none      -1    66.22   31.67   29.69       0    65.77   31.89   29.89    N/A
+     4194304         65536     float    none      -1    87.84   47.75   44.76       0    88.12   47.60   44.62    N/A
+     8388608        131072     float    none      -1   160.22   52.36   49.09       0   132.22   63.44   59.48    N/A
+    16777216        262144     float    none      -1   223.32   75.13   70.43       0   219.45   76.45   71.67    N/A
+    33554432        524288     float    none      -1   401.10   83.66   78.43       0   401.56   83.56   78.34    N/A
+    67108864       1048576     float    none      -1   750.95   89.37   83.78       0   750.44   89.43   83.84    N/A
+   134217728       2097152     float    none      -1  1449.19   92.62   86.83       0  1449.73   92.58   86.80    N/A
+   268435456       4194304     float    none      -1  2884.99   93.05   87.23       0  2866.37   93.65   87.80    N/A
+   536870912       8388608     float    none      -1  5711.08   94.01   88.13       0  5708.98   94.04   88.16    N/A
+  1073741824      16777216     float    none      -1  11253.5   95.41   89.45       0  11254.5   95.41   89.44    N/A
+  2147483648      33554432     float    none      -1  22288.5   96.35   90.33       0  22289.7   96.34   90.32    N/A
+  4294967296      67108864     float    none      -1  44361.2   96.82   90.77       0  44361.6   96.82   90.77    N/A
+  8589934592     134217728     float    none      -1  88508.6   97.05   90.99       0  88509.2   97.05   90.99    N/A
+ 17179869184     268435456     float    none      -1   176806   97.17   91.09       0   176804   97.17   91.10    N/A
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 36.0754
+#
+# Collective test concluded: alltoall_perf
+
+
+
 
 ```
+
+
 
 

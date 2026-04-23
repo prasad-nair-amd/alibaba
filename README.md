@@ -686,6 +686,8 @@ $ ./run_inter_mori.sh
 
 ## Test 11. Multi Node Collective Communication	RCCL - AllReduce Bandwidth
 
+Avoid building by using docker image : docker pull prasadnairamd/rocm-multinode:7.2.2-complete 
+Building RCCL docker takes half an hour. 
 For building the docker clone the below repo. Do this on both the nodes you are trying to run the RCCL multi-node test : 
 ```
 git clone https://github.com/ROCm/rocm-systems.git -b users/atulkulk/mndock
@@ -792,6 +794,8 @@ Librccl path : /opt/rocm/lib/librccl.so.1
 
 ## Test 12. Multi Node Collective Communication	RCCL - AlltoAll Bandwidth
 
+Avoid building by using docker image : docker pull prasadnairamd/rocm-multinode:7.2.2-complete 
+Building RCCL docker takes half an hour. 
 For building the docker clone the below repo .  Do this on both the nodes you are trying to run the RCCL multi-node test : 
 ```
 git clone https://github.com/ROCm/rocm-systems.git -b users/atulkulk/mndock

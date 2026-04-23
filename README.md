@@ -240,6 +240,61 @@ docker run --rm   --device=/dev/kfd   --device=/dev/dri   --group-add video   --
 ## Test 7. Single Node Collective Communication	Mori-EP
 ```
 $ ./run_intra_mori.sh
+
+------------------------------------------------------------
+[Gloo] Rank 0 is connected to 7 peer ranks. Expected number of connected peer ranks is : 7
+[Gloo] Rank 1 is connected to 7 peer ranks. Expected number of connected peer ranks is : 7
+[Gloo] Rank 2 is connected to 7 peer ranks. Expected number of connected peer ranks is : 7
+[Gloo] Rank 3 is connected to 7 peer ranks. Expected number of connected peer ranks is : 7
+[Gloo] Rank 4 is connected to 7 peer ranks. Expected number of connected peer ranks is : 7
+[Gloo] Rank 5 is connected to 7 peer ranks. Expected number of connected peer ranks is : 7
+[Gloo] Rank 7 is connected to 7 peer ranks. Expected number of connected peer ranks is : 7
+[Gloo] Rank 6 is connected to 7 peer ranks. Expected number of connected peer ranks is : 7
+
+============================================================
+Benchmarking with dispatch_block_num=80, dispatch_warp_per_block=16 combine_block_num=80, combine_warp_per_block=4
+============================================================
+Dispatch result:
+Round 0 duration(us) [848.5, 846.1, 846.5, 847.7, 849.3, 850.2, 845.9, 848.4] bandwidth(GB/s) [366.52, 366.96, 365.92, 366.6, 366.38, 365.73, 367.83, 365.4] avg bytes(MB) 296.27 lat 847.8 bw 366.42 / 553.46
+Round 1 duration(us) [848.9, 847.0, 848.3, 851.5, 849.9, 851.5, 847.5, 849.3] bandwidth(GB/s) [366.37, 366.59, 365.14, 364.96, 366.14, 365.17, 367.16, 365.01] avg bytes(MB) 296.27 lat 849.2 bw 365.82 / 552.55
+Round 2 duration(us) [848.3, 848.1, 848.5, 849.8, 849.8, 851.0, 847.5, 849.9] bandwidth(GB/s) [366.61, 366.11, 365.06, 365.69, 366.19, 365.36, 367.15, 364.77] avg bytes(MB) 296.27 lat 849.1 bw 365.87 / 552.63
+Round 3 duration(us) [843.0, 841.0, 842.4, 842.1, 843.8, 843.1, 842.3, 843.5] bandwidth(GB/s) [368.94, 369.21, 367.72, 369.0, 368.79, 368.82, 369.4, 367.51] avg bytes(MB) 296.27 lat 842.7 bw 368.67 / 556.87
+Round 4 duration(us) [849.5, 847.4, 849.5, 849.9, 849.6, 851.9, 847.9, 851.0] bandwidth(GB/s) [366.1, 366.38, 364.66, 365.61, 366.25, 364.99, 366.96, 364.3] avg bytes(MB) 296.27 lat 849.6 bw 365.66 / 552.31
+Round 5 duration(us) [846.3, 845.4, 845.1, 848.7, 846.5, 848.9, 847.1, 848.1] bandwidth(GB/s) [367.5, 367.28, 366.52, 366.16, 367.6, 366.28, 367.33, 365.55] avg bytes(MB) 296.27 lat 847.0 bw 366.78 / 554.00
+Round 6 duration(us) [850.4, 848.0, 850.8, 850.4, 851.1, 853.4, 849.9, 850.7] bandwidth(GB/s) [365.71, 366.12, 364.07, 365.41, 365.6, 364.36, 366.1, 364.44] avg bytes(MB) 296.27 lat 850.6 bw 365.23 / 551.66
+Round 7 duration(us) [848.2, 847.6, 847.5, 848.9, 849.2, 849.9, 846.9, 849.5] bandwidth(GB/s) [366.68, 366.3, 365.48, 366.06, 366.44, 365.83, 367.43, 364.93] avg bytes(MB) 296.27 lat 848.5 bw 366.14 / 553.05
+Round 8 duration(us) [845.5, 845.3, 845.7, 846.6, 848.1, 847.8, 845.2, 847.0] bandwidth(GB/s) [367.83, 367.33, 366.28, 367.07, 366.9, 366.76, 368.14, 366.0] avg bytes(MB) 296.27 lat 846.4 bw 367.04 / 554.40
+Round 9 duration(us) [848.6, 845.6, 846.5, 848.1, 848.5, 850.1, 846.0, 850.0] bandwidth(GB/s) [366.49, 367.19, 365.92, 366.42, 366.74, 365.74, 367.79, 364.7] avg bytes(MB) 296.27 lat 847.9 bw 366.37 / 553.39
+
+Combine result:
+Round 0 duration(us) [808.7, 810.0, 810.3, 808.6, 807.2, 806.8, 810.4, 808.1] bandwidth(GB/s) [384.56, 383.3, 382.3, 384.29, 385.51, 385.41, 383.95, 383.63] avg bytes(MB) 296.27 lat 808.8 bw 384.12 / 580.20
+Round 1 duration(us) [809.5, 810.8, 809.5, 806.8, 807.9, 806.1, 810.8, 808.0] bandwidth(GB/s) [384.19, 382.95, 382.67, 385.16, 385.15, 385.74, 383.77, 383.68] avg bytes(MB) 296.27 lat 808.7 bw 384.16 / 580.27
+Round 2 duration(us) [809.1, 808.9, 808.5, 808.0, 807.4, 805.9, 809.5, 807.4] bandwidth(GB/s) [384.41, 383.85, 383.14, 384.57, 385.4, 385.82, 384.38, 383.96] avg bytes(MB) 296.27 lat 808.1 bw 384.44 / 580.68
+Round 3 duration(us) [808.9, 811.0, 808.7, 809.6, 808.1, 808.2, 808.5, 807.1] bandwidth(GB/s) [384.46, 382.86, 383.05, 383.84, 385.09, 384.74, 384.86, 384.11] avg bytes(MB) 296.27 lat 808.8 bw 384.13 / 580.21
+Round 4 duration(us) [808.6, 810.0, 808.5, 808.9, 808.6, 805.2, 809.9, 807.0] bandwidth(GB/s) [384.64, 383.33, 383.15, 384.17, 384.83, 386.16, 384.18, 384.17] avg bytes(MB) 296.27 lat 808.3 bw 384.33 / 580.51
+Round 5 duration(us) [808.7, 809.9, 809.7, 806.2, 808.1, 805.9, 808.1, 807.4] bandwidth(GB/s) [384.58, 383.34, 382.55, 385.43, 385.08, 385.8, 385.06, 383.97] avg bytes(MB) 296.27 lat 808.0 bw 384.48 / 580.74
+Round 6 duration(us) [808.1, 810.4, 807.4, 807.6, 807.6, 805.4, 809.0, 808.0] bandwidth(GB/s) [384.88, 383.12, 383.63, 384.77, 385.32, 386.08, 384.61, 383.68] avg bytes(MB) 296.27 lat 807.9 bw 384.51 / 580.79
+Round 7 duration(us) [809.3, 809.8, 810.4, 808.5, 808.0, 807.2, 810.8, 807.4] bandwidth(GB/s) [384.27, 383.42, 382.25, 384.34, 385.14, 385.18, 383.78, 383.95] avg bytes(MB) 296.27 lat 808.9 bw 384.04 / 580.08
+Round 8 duration(us) [809.1, 810.0, 809.4, 808.6, 806.9, 806.8, 809.8, 808.2] bandwidth(GB/s) [384.39, 383.3, 382.69, 384.32, 385.66, 385.4, 384.27, 383.6] avg bytes(MB) 296.27 lat 808.6 bw 384.20 / 580.33
+Round 9 duration(us) [808.1, 811.4, 810.2, 808.3, 807.8, 806.3, 810.2, 806.0] bandwidth(GB/s) [384.84, 382.67, 382.34, 384.43, 385.2, 385.62, 384.04, 384.62] avg bytes(MB) 296.27 lat 808.5 bw 384.22 / 580.35
+
+End-to-end result:
+Note: e2e is one full-graph replay; separate results use two graph replays, so sep total is usually higher.
+Round 0 e2e(us) [1632.8, 1633.1, 1632.9, 1633.2, 1633.0, 1633.1, 1633.6, 1633.3]
+Round 1 e2e(us) [1635.2, 1634.1, 1634.1, 1633.8, 1634.1, 1633.7, 1634.4, 1634.2]
+Round 2 e2e(us) [1636.9, 1637.8, 1637.1, 1637.0, 1637.3, 1636.8, 1637.7, 1637.0]
+Round 3 e2e(us) [1633.2, 1633.3, 1633.7, 1633.2, 1633.1, 1633.1, 1633.5, 1633.1]
+Round 4 e2e(us) [1632.9, 1633.5, 1633.1, 1632.5, 1633.0, 1632.7, 1633.1, 1633.0]
+Round 5 e2e(us) [1634.2, 1634.2, 1633.6, 1633.4, 1633.7, 1633.0, 1633.9, 1633.9]
+Round 6 e2e(us) [1636.1, 1635.7, 1636.5, 1635.8, 1636.4, 1635.6, 1636.0, 1636.2]
+Round 7 e2e(us) [1635.3, 1635.5, 1635.2, 1635.5, 1635.3, 1634.8, 1635.4, 1635.3]
+Round 8 e2e(us) [1636.4, 1636.1, 1636.2, 1636.6, 1636.9, 1636.0, 1636.7, 1636.3]
+Round 9 e2e(us) [1639.5, 1639.0, 1638.7, 1639.1, 1638.8, 1638.6, 1638.7, 1639.4]
+Stop amd rm the docker mori
+mori
+
+
+
 ```
 ## Test 8. Multi Node Collective Communication	ib_write_bw Test
 

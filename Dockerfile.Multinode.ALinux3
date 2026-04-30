@@ -1,0 +1,256 @@
+# Dockerfile.Multinode.ALinux3
+#
+# Adds multi-node execution infrastructure on top of any ROCm ALinux3 base image:
+#   - SSH server/client configured for passwordless inter-node access
+#   - Non-root user with sudo, video group, and GPU access
+#   - Build tools needed to compile UCX/OpenMPI (built once into shared dir)
+#   - Shared-directory mount points for NFS
+#   - PATH setup for shared tools and venvs
+#
+# Build:
+#   docker build --build-arg ROCM_IMAGE=<alinux3-rocm-base>:latest \
+#                -t rocm-multinode-alinux3:latest -f Dockerfile.Multinode.ALinux3 .
+#
+# See setup_multinode.sh for a one-command build + launch workflow.
+
+ARG ROCM_IMAGE_NAME=rocm/dev-almalinux-8
+ARG ROCM_IMAGE_TAG=7.2.2-complete
+FROM "${ROCM_IMAGE_NAME}:${ROCM_IMAGE_TAG}"
+
+ARG SSH_PORT=2224
+ARG CONTAINER_USER=alinux
+
+ARG ROCM_SYSTEMS_REPO=https://github.com/ROCm/rocm-systems.git
+ARG ROCM_SYSTEMS_BRANCH=develop
+ARG GPU_TARGETS=gfx950
+ENV GPU_TARGETS=${GPU_TARGETS}
+
+ENV ROCM_PATH=/opt/rocm
+ENV SSH_PORT=${SSH_PORT}
+ENV CONTAINER_USER=${CONTAINER_USER}
+ENV OMPI_ALLOW_RUN_AS_ROOT=1
+ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+
+# ---------------------------------------------------------------------------
+# Packages: SSH, networking, GPU diagnostics
+# ---------------------------------------------------------------------------
+RUN echo ">>> Installing multi-node packages..." \
+    && dnf install -y \
+    openssh-server \
+    openssh-clients \
+    sudo \
+    iproute \
+    net-tools \
+    iputils \
+    numactl-libs \
+    numactl-devel \
+    pciutils \
+    lshw \
+    vim-enhanced \
+    less \
+    git \
+    curl \
+    wget \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf \
+    && echo ">>> Installed packages:" \
+    && rpm -q openssh-server openssh-clients sudo iproute | sed 's/^/      /'
+
+# ---------------------------------------------------------------------------
+# SSH daemon: host keys, privilege-sep dir, config
+# ---------------------------------------------------------------------------
+RUN echo ">>> Configuring SSH daemon (port ${SSH_PORT})..." \
+    && ssh-keygen -A \
+    && mkdir -p /run/sshd \
+    && sed -i "s/^#*Port .*/Port ${SSH_PORT}/"                           /etc/ssh/sshd_config \
+    && sed -i 's/^#*PermitRootLogin .*/PermitRootLogin yes/'             /etc/ssh/sshd_config \
+    && sed -i 's/^#*PubkeyAuthentication .*/PubkeyAuthentication yes/'   /etc/ssh/sshd_config \
+    && sed -i 's/^#*PasswordAuthentication .*/PasswordAuthentication no/' /etc/ssh/sshd_config \
+    && echo ">>> SSH config:" \
+    && grep -E '^(Port|PermitRootLogin|PubkeyAuthentication|PasswordAuthentication) ' /etc/ssh/sshd_config | sed 's/^/      /' \
+    && echo ">>> Host keys:" \
+    && ls -l /etc/ssh/ssh_host_*_key 2>/dev/null | awk '{printf "      %s %s\n", $5, $NF}'
+
+# ---------------------------------------------------------------------------
+# Build tools needed for compiling UCX/OpenMPI into the shared directory.
+# The actual build is done once via: setup_multinode.sh --setup-deps
+# ---------------------------------------------------------------------------
+RUN echo ">>> Installing build tools for shared deps..." \
+    && dnf install -y \
+    gcc \
+    gcc-c++ \
+    make \
+    cmake \
+    autoconf \
+    automake \
+    libtool \
+    pkgconfig \
+    gettext \
+    libdrm-devel \
+    elfutils-libelf-devel \
+    vim-common \
+    mesa-libGL-devel \
+    libibverbs-utils \
+    libibverbs-devel \
+    librdmacm-devel \
+    rdma-core-devel \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
+
+# ---------------------------------------------------------------------------
+# AINIC driver build prerequisites (rdma-core from source + AINIC kernel mod)
+# ---------------------------------------------------------------------------
+RUN echo ">>> Installing AINIC driver prerequisites..." \
+    && dnf install -y \
+    python3-devel \
+    python3-Cython \
+    systemd-devel \
+    libudev-devel \
+    libnl3-devel \
+    python3-docutils \
+    ninja-build \
+    rdma-core \
+    infiniband-diags \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
+
+# ---------------------------------------------------------------------------
+# Fix ROCm compiler paths for images that ship compilers only in
+# /opt/rocm/lib/llvm/bin/ without the expected /opt/rocm/bin/ symlinks.
+# ---------------------------------------------------------------------------
+RUN echo ">>> Checking ROCm compiler symlinks..." \
+    && if [ -L /opt/rocm/bin/amdclang++ ] && ! [ -e /opt/rocm/bin/amdclang++ ]; then \
+           ln -sf ../lib /opt/rocm/bin/lib \
+           && echo ">>>   Fixed bridge: /opt/rocm/bin/lib -> ../lib" ; \
+       fi \
+    && for tool in clang clang++ clang-cpp lld ld.lld llvm-ar llvm-mc llvm-nm llvm-objcopy llvm-objdump llvm-readelf; do \
+           if ! [ -e /opt/rocm/bin/${tool} ] && [ -e /opt/rocm/lib/llvm/bin/${tool} ]; then \
+               ln -sf ../lib/llvm/bin/${tool} /opt/rocm/bin/${tool} \
+               && echo ">>>   Linked /opt/rocm/bin/${tool}" ; \
+           fi ; \
+       done \
+    && echo ">>> Compiler check complete: $(/opt/rocm/bin/amdclang++ --version 2>/dev/null | head -1 || echo 'amdclang++ not available')"
+
+# ---------------------------------------------------------------------------
+# Workspace for RCCL / RCCL-Tests builds
+# ---------------------------------------------------------------------------
+ENV WORKDIR=/workspace
+RUN mkdir -p ${WORKDIR}
+WORKDIR ${WORKDIR}
+
+# ---------------------------------------------------------------------------
+# Newer CMake (RCCL build requires >= 3.21)
+# ---------------------------------------------------------------------------
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.28.0/cmake-3.28.0-linux-x86_64.sh \
+    && bash ./cmake-3.28.0-linux-x86_64.sh --prefix=/usr --exclude-subdir --skip-license \
+    && rm cmake-3.28.0-linux-x86_64.sh \
+    && echo ">>> cmake $(cmake --version | head -1)"
+
+# ---------------------------------------------------------------------------
+# Sparse-checkout rocm-systems (rccl, rccl-tests, rocshmem)
+# ---------------------------------------------------------------------------
+RUN git clone --no-checkout --filter=blob:none "${ROCM_SYSTEMS_REPO}" rocm-systems \
+    && cd rocm-systems \
+    && git sparse-checkout init --cone \
+    && git sparse-checkout set projects/{rccl,rccl-tests,rocshmem} \
+    && git checkout "${ROCM_SYSTEMS_BRANCH}" \
+    && echo ">>> Sparse checkout: $(git log -1 --format='%h %s')"
+
+# ---------------------------------------------------------------------------
+# RCCL (built from source)
+# ---------------------------------------------------------------------------
+ENV RCCL_INSTALL_PREFIX=${WORKDIR}/rocm-systems/projects/rccl/install
+RUN cd rocm-systems/projects/rccl \
+    && ./install.sh --amdgpu_targets=${GPU_TARGETS} --prefix=${RCCL_INSTALL_PREFIX} \
+    && echo ">>> RCCL installed to ${RCCL_INSTALL_PREFIX}"
+
+# ---------------------------------------------------------------------------
+# RCCL-Tests: source is checked out above; built at container startup
+# once /opt/shared/ompi is available (see post-setup/setup.sh)
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# RCCL environment
+# ---------------------------------------------------------------------------
+ENV PATH="${ROCM_PATH}/bin:${PATH}"
+ENV LD_LIBRARY_PATH="${RCCL_INSTALL_PREFIX}:${ROCM_PATH}/lib:${LD_LIBRARY_PATH}"
+ENV UCX_WARN_UNUSED_ENV_VARS=n
+ENV NCCL_DEBUG=VERSION
+
+# ---------------------------------------------------------------------------
+# Mount-point stubs with permissive defaults
+# ---------------------------------------------------------------------------
+RUN echo ">>> Creating mount-point directories..." \
+    && mkdir -p -m 777 /opt/shared /opt/builds \
+    && mkdir -p /opt/ssh-keys /opt/post-setup \
+    && echo ">>> Mount points:" \
+    && ls -ld /opt/shared /opt/builds /opt/ssh-keys /opt/post-setup | sed 's/^/      /'
+
+# ---------------------------------------------------------------------------
+# Non-root user (entrypoint remaps UID/GID at runtime to match the host)
+# ---------------------------------------------------------------------------
+RUN echo ">>> Creating user '${CONTAINER_USER}'..." \
+    && (groupadd -g 109 render 2>/dev/null || true) \
+    && (groupadd -g 1000 ${CONTAINER_USER} 2>/dev/null || true) \
+    && (useradd -u 1000 -g 1000 -m -s /bin/bash ${CONTAINER_USER} 2>/dev/null || true) \
+    && (usermod -aG video,render ${CONTAINER_USER} 2>/dev/null || true) \
+    && echo "${CONTAINER_USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
+    && echo ">>> User info:" \
+    && id ${CONTAINER_USER} | sed 's/^/      /' \
+    && echo ">>> Home:" \
+    && ls -ld /home/${CONTAINER_USER} | sed 's/^/      /'
+
+# ---------------------------------------------------------------------------
+# Shared-tools PATH setup (profile.d is sourced by login shells; the bashrc
+# hook covers non-login shells like "docker exec ... bash")
+# ---------------------------------------------------------------------------
+RUN echo ">>> Setting up shared-tools PATH hooks..." \
+    && { echo '# Shared deps (UCX, OpenMPI) and tools mounted at runtime'; \
+         echo 'for d in /opt/shared/ompi/bin /opt/shared/ucx/bin /opt/shared/bin /opt/builds/venv/bin; do'; \
+         echo '    [ -d "$d" ] && case ":$PATH:" in *":$d:"*) ;; *) export PATH="$d:$PATH" ;; esac'; \
+         echo 'done'; \
+         echo 'for d in /opt/shared/ompi/lib /opt/shared/ucx/lib; do'; \
+         echo '    [ -d "$d" ] && case ":$LD_LIBRARY_PATH:" in *":$d:"*) ;; *) export LD_LIBRARY_PATH="$d:${LD_LIBRARY_PATH:-}" ;; esac'; \
+         echo 'done'; \
+         echo '# OpenMPI / UCX prefix so runtime data files are found'; \
+         echo '[ -d /opt/shared/ompi ] && export OPAL_PREFIX=/opt/shared/ompi'; \
+         echo '[ -d /opt/shared/ucx ]  && export UCX_PREFIX=/opt/shared/ucx'; \
+         echo '# Preload UCX core libraries with global visibility so OpenMPI PML UCX'; \
+         echo '# can discover transport plugins (avoids RTLD_LOCAL + PROTECTED symbol issue)'; \
+         echo 'if [ -z "$LD_PRELOAD" ] && [ -f /opt/shared/ucx/lib/libucs.so ]; then'; \
+         echo '    export LD_PRELOAD="/opt/shared/ucx/lib/libucs.so:/opt/shared/ucx/lib/libuct.so:/opt/shared/ucx/lib/libucp.so"'; \
+         echo 'fi'; \
+       } > /etc/profile.d/shared-tools.sh \
+    && chmod 644 /etc/profile.d/shared-tools.sh \
+    && (for rc in /root/.bashrc /home/${CONTAINER_USER}/.bashrc; do \
+          [ -f "$rc" ] && echo 'source /etc/profile.d/shared-tools.sh' >> "$rc"; \
+        done || true) \
+    && echo ">>> /etc/profile.d/shared-tools.sh:" \
+    && cat /etc/profile.d/shared-tools.sh | sed 's/^/      /'
+
+# ---------------------------------------------------------------------------
+# Entrypoint (runtime: UID remap, SSH keys, sshd start)
+# ---------------------------------------------------------------------------
+COPY entrypoint.sh /opt/entrypoint.sh
+COPY post-setup/ainic/install_driver.sh /opt/install_ainic_driver.sh
+RUN chmod +x /opt/entrypoint.sh /opt/install_ainic_driver.sh \
+    && echo ">>> Entrypoint + AINIC installer installed:" \
+    && ls -l /opt/entrypoint.sh /opt/install_ainic_driver.sh | sed 's/^/      /'
+
+# ---------------------------------------------------------------------------
+# Build summary
+# ---------------------------------------------------------------------------
+RUN echo "========================================" \
+    && echo ">>> Dockerfile.Multinode.ALinux3 build complete" \
+    && echo "========================================" \
+    && echo "  ROCm:       $(cat /opt/rocm/.info/version 2>/dev/null || echo 'unknown')" \
+    && echo "  SSH port:   ${SSH_PORT}" \
+    && echo "  User:       ${CONTAINER_USER} (uid=$(id -u ${CONTAINER_USER}), gid=$(id -g ${CONTAINER_USER}))" \
+    && echo "  Entrypoint: /opt/entrypoint.sh" \
+    && echo "  Mount pts:  /opt/shared /opt/builds /opt/ssh-keys /opt/post-setup" \
+    && echo "  Shared deps: UCX + OpenMPI built via --setup-deps into /opt/shared" \
+    && echo "========================================"
+
+EXPOSE ${SSH_PORT}
+
+ENTRYPOINT ["/opt/entrypoint.sh"]

@@ -1,0 +1,80 @@
+## base docker image
+ARG ROCM_IMAGE_NAME=rocm/dev-almalinux-8
+ARG ROCM_IMAGE_TAG=7.2.1-complete
+FROM "${ROCM_IMAGE_NAME}:${ROCM_IMAGE_TAG}"
+
+## AMD GPU Targets
+#ARG GPU_TARGETS=gfx950
+
+## install dependencies (Alma Linux 8 / RHEL-style: dnf, *-devel, gcc toolchain)
+RUN dnf install -y epel-release \
+    && dnf update -y \
+    && dnf install -y --setopt=install_weak_deps=False \
+    ca-certificates \
+    git \
+    make \
+    rocm-cmake \
+    ninja-build \
+    gcc-gfortran \
+    gcc \
+    gcc-c++ \
+    libomp \
+    libomp-devel \
+    binutils-devel \
+    boost-devel \
+    numactl-libs \
+    numactl-devel \
+    libzstd-devel \
+    lcov \
+    zip \
+    zlib-devel \
+    wget \
+    pkgconf-pkg-config \
+    unzip \
+    chrpath \
+    doxygen \
+    lshw \
+    openssl-devel \
+    curl \
+    ncurses-devel \
+    xz \
+    xz-devel \
+    python3 \
+    python3-pip \
+    python3-setuptools \
+    python3-devel \
+    python3-tkinter \
+    python3-pyyaml \
+    vim \
+    less \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
+
+
+
+## Install OpenMPI
+ENV MPI_INSTALL_PREFIX=/opt/ompi
+RUN wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.6.tar.gz \
+    && mkdir -p ompi4 \
+    && tar -zxf openmpi-4.1.6.tar.gz -C ompi4 --strip-components=1 \
+    && cd ompi4 \
+    && mkdir build \
+    && cd build \
+    && ../configure --prefix=${MPI_INSTALL_PREFIX} --with-ucx=${UCX_INSTALL_PREFIX} --disable-oshmem --disable-mpi-fortran --enable-orterun-prefix-by-default \
+    && make -j16 install \
+    && cd ../.. \
+    && rm -rf ompi4 openmpi-4.1.6.tar.gz
+
+#RCCL
+RUN git clone --no-checkout --filter=blob:none https://github.com/ROCm/rocm-systems.git rocm-sparse
+WORKDIR /rocm-sparse
+RUN git sparse-checkout init --cone
+RUN git sparse-checkout set projects/{rccl,rccl-tests,rocshmem}
+RUN git checkout develop
+
+WORKDIR /rocm-sparse/projects/rccl
+RUN ./install.sh -l
+WORKDIR /rocm-sparse/projects/rccl-tests
+RUN ./install.sh --rccl_home=/rocm-sparse/projects/rccl/build/release --rocm_home=/opt/rocm --hip_compiler=/opt/rocm/llvm/bin/amdclang++ -m --mpi_home=/opt/ompi/ 
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/rocm/lib:/usr/local/lib:/opt/rh/gcc-toolset-9/root/lib:/opt/rh/gcc-toolset-9/root/lib64:/opt/ompi/lib
+#RUN ./build/all_reduce_perf   -f 2 -g 8 -b 4 -e 1G 2>&1
